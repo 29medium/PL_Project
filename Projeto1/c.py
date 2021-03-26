@@ -12,7 +12,7 @@ def toSingular(plural):
 
 
 obsRE = re.compile(r'<obs>((.|\n)*?)</obs>')
-familyRE = re.compile(r'(\. )?((.+),(.+))\. Proc')
+familyRE = re.compile(r'((.+),(.+))\. Proc')
 
 withFamily = 0
 frequencyFamily = {}
@@ -29,11 +29,11 @@ for line in obs:
         withFamily += 1
 
         for relativeGroup in family:
-            grau = relativeGroup[3]
+            grau = relativeGroup[2]
             numFamiliares = 1
 
             if isPlural(grau):
-                relatives = re.split(' e |, ', relativeGroup[2])
+                relatives = re.split(' e |, ', relativeGroup[1])
                 numFamiliares = len(relatives)
                 grau = toSingular(grau)
 
