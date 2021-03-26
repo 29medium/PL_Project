@@ -25,8 +25,10 @@ numProcessesYear = {}
 minDate = '9999-99-99'
 maxDate = '0000-00-00'
 
+dataRE = re.compile(r'^<data>((\d{4})-\d{2}-\d{2})')
+
 for line in file:
-    m = re.search(r'^<data>((\d{4})-\d{2}-\d{2})', line.strip())
+    m = re.search(dataRE, line.strip())
 
     if m:
         year = m.group(2)
