@@ -2,19 +2,23 @@ import re
 
 
 def printPrimeiro():
-    print(f'\n5 nomes próprios mais frequêntes\n')
+    print('\n---------------------------------')
+    print('5 Primeiros Nomes mais frequentes')
+    print('---------------------------------')
 
 
 def printApelidos():
-    print(f'\n5 apelidos mais frequêntes\n')
+    print('\n---------------------------------')
+    print('5 Últimos Nomes mais frequentes')
+    print('---------------------------------')
 
 
 def printSeculo(sec):
-    print(f'\nSÉCULO ' + '\033[1m' + str(sec))
+    print('\nSÉCULO ' + '\033[1m' + str(sec))
 
 
 def printNome(nome, valor):
-    print(f'\nNome ' + '\033[1m' + nome +
+    print('Nome ' + '\033[1m' + nome +
           '  \033[0m' + ' Valor ' + '\033[1m' + str(valor))
 
 
@@ -27,8 +31,8 @@ seculo = 0
 seculoPrimeiro = {}
 seculoUltimo = {}
 
-nomeRE = re.compile(r'^<nome>(([a-zA-Z]+ )([a-zA-Z]+ )*([a-zA-Z]+))')
-dataRE = re.compile(r'^<data>((\d{4})-\d{2}-\d{2})')
+nomeRE = re.compile(r'^<nome>(([a-zA-Z]+ )([a-zA-Z]+ )*([a-zA-Z]+))</nome>')
+dataRE = re.compile(r'^<data>((\d{4})-\d{2}-\d{2})</data>')
 
 for line in file:
     nome = re.search(nomeRE, line.strip())

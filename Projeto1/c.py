@@ -42,7 +42,7 @@ for line in obs:
             else:
                 frequencyFamily[grau] = numFamiliares
 
-print("Numero de candidatos com parentes eclásticos: " + str(withFamily))
+print("Numero de candidatos com parentes eclesiásticos: " + str(withFamily))
 
 print("Tipo de parentesco mais frequente: " +
       max(frequencyFamily.items(), key=operator.itemgetter(1))[0])
