@@ -1,5 +1,7 @@
 import re
+from graphviz import Digraph
 
+dot = Digraph()
 processes = set()
 
 while True:
@@ -23,6 +25,10 @@ for line in content:
         year = int(line[3])
 
         if year == data:
-            nome = line[5]
-            pai = line[7]
-            mae = line[9]
+            dot.node(line[5])
+            dot.node(line[7])
+            dot.node(line[9])
+            dot.edge(line[5], line[7])
+            dot.edge(line[5], line[9])
+
+dot.render('output/graph.gv', view=True)
