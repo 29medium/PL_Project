@@ -2,7 +2,6 @@ import re
 
 
 def yearToCent(yearList):
-
     centList = [(int(year) // 100) + 1 for year in yearList]
 
     return list(dict.fromkeys(centList))
