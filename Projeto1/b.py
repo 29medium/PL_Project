@@ -22,32 +22,29 @@ def printNome(nome, valor):
           '  \033[0m' + ' Valor ' + '\033[1m' + str(valor))
 
 
-file = open('processos.xml', 'r')
-
-next(file)
-next(file)
-
 seculo = 0
-seculoPrimeiro = {}
-seculoUltimo = {}
+seculoPrimeiro = dict()
+seculoUltimo = dict()
+processes = set()
 
-nomeRE = re.compile(r'^<nome>(([a-zA-Z]+ )([a-zA-Z]+ )*([a-zA-Z]+))</nome>')
-dataRE = re.compile(r'^<data>((\d{4})-\d{2}-\d{2})</data>')
+contentRE = re.compile(
+    r'<processo id="(\d+)">(.|\n)*?<data>((\d{4})-\d{2}-\d{2})</data>(.|\n)*?<nome>([a-zA-Z]+ )([a-zA-Z]+ )*([a-zA-Z]+)</nome>')
 
-for line in file:
-    nome = re.search(nomeRE, line.strip())
-    data = re.search(dataRE, line.strip())
+with open("processos.xml") as f:
+    file = f.read()
+    content = re.findall(contentRE, file)
 
-    if data:
-        seculo = int(data.group(2)) // 100 + 1
+for line in content:
+    if line[0] not in processes:
+        processes.add(line[0])
 
-    if nome:
-        primeiro = nome.group(2)
-        ultimo = nome.group(4)
+        seculo = int(line[3]) // 100 + 1
+        primeiro = line[5]
+        ultimo = line[7]
 
         if seculo not in seculoPrimeiro:
-            seculoPrimeiro[seculo] = {}
-            seculoUltimo[seculo] = {}
+            seculoPrimeiro[seculo] = dict()
+            seculoUltimo[seculo] = dict()
 
         if primeiro in seculoPrimeiro[seculo]:
             seculoPrimeiro[seculo][primeiro] += 1
@@ -83,5 +80,3 @@ for sec in seculoUltimo.keys():
     printSeculo(sec)
     for item in seculoUltimo[sec].items():
         printNome(item[0], item[1])
-
-file.close()

@@ -28,12 +28,12 @@ maxDate = '0000-00-00'
 numProcessesYear = dict()
 processes = set()
 
-processRE = re.compile(
+contentRE = re.compile(
     r'<processo id="(\d+)">(.|\n)*?<data>((\d{4})-\d{2}-\d{2})</data>')
 
 with open("processos.xml") as f:
     file = f.read()
-    content = re.findall(processRE, file)
+    content = re.findall(contentRE, file)
 
 for line in content:
     if line[0] not in processes:

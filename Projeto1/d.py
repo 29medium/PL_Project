@@ -1,40 +1,56 @@
 import re
 
-file = open('processos.xml', 'r')
 
-next(file)
-next(file)
+def printPais():
+    print("\n--------------")
+    print("     Pais     ")
+    print("--------------\n")
 
-pais = {}
-maes = {}
 
-paiRE = re.compile(r'^<pai>(.+)</pai>')
-maeRE = re.compile(r'^<mae>(.+)</mae>')
+def printMaes():
+    print("\n--------------")
+    print("     Maes     ")
+    print("--------------\n")
 
-for line in file:
-    paiSr = re.search(paiRE, line.strip())
-    maeSr = re.search(maeRE, line.strip())
-    if paiSr:
-        pai = paiSr.group(1)
+
+pais = dict()
+maes = dict()
+processes = set()
+
+contentRE = re.compile(
+    r'<processo id="(\d+)">(.|\n)*?<pai>(.+)</pai>(.|\n)*?<mae>(.+)</mae>')
+
+with open("processos.xml") as f:
+    file = f.read()
+    content = re.findall(contentRE, file)
+
+for line in content:
+    if line[0] not in processes:
+        processes.add(line[0])
+
+        pai = line[2]
+        mae = line[4]
+
         if pai in pais:
             pais[pai] += 1
         else:
             pais[pai] = 1
-    if maeSr:
-        mae = maeSr.group(1)
+
         if mae in maes:
             maes[mae] += 1
         else:
             maes[mae] = 1
 
-print("\nPais:\n")
+pais = dict((k, v) for k, v in sorted(
+    pais.items(), key=lambda p: p[1], reverse=True)[:10] if v > 1)
+
+maes = dict((k, v) for k, v in sorted(
+    maes.items(), key=lambda p: p[1], reverse=True)[:10] if v > 1)
+
+printPais()
 for pai in pais.items():
-    if pai[1] > 1:
-        print(pai[0] + ": " + str(pai[1]))
+    print(pai[0] + ": " + str(pai[1]))
 
-print("\nMães:\n")
+printMaes()
 for mae in maes.items():
-    if mae[1] > 1:
-        print(mae[0] + ": " + str(mae[1]))
-
-file.close()
+    print(mae[0] + ": " + str(mae[1]))

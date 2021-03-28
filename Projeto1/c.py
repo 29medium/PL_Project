@@ -10,7 +10,7 @@ def toSingular(plural):
     return re.sub(r's$', r'', singular)
 
 
-obsRE = re.compile(
+contentRE = re.compile(
     r'<processo id="(\d+)">(.|\n)*?(<obs>((.|\n)*?)</obs>|<obs/>)')
 familyRE = re.compile(r'((.+),(.+))\. Proc\.\d+')
 
@@ -20,7 +20,7 @@ processes = set()
 
 with open("processos.xml") as f:
     file = f.read()
-    content = re.findall(obsRE, file)
+    content = re.findall(contentRE, file)
 
 for line in content:
     if line[0] not in processes:
