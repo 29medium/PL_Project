@@ -11,38 +11,49 @@ def toSingular(plural):
     return re.sub(r's$', r'', singular)
 
 
-obsRE = re.compile(r'<obs>((.|\n)*?)</obs>')
-familyRE = re.compile(r'((.+),(.+))\. Proc')
+obsRE = re.compile(
+    r'<processo id="(\d+)">(.|\n)*?(<obs>((.|\n)*?)</obs>|<obs/>)')
+familyRE = re.compile(r'((.+),(.+))\. Proc\.\d+')
 
 withFamily = 0
 frequencyFamily = {}
+processes = set()
 
 with open("processos.xml") as f:
     conteudo = f.read()
     obs = re.findall(obsRE, conteudo)
 
 for line in obs:
-    linha = re.sub(r'( |\n)+', r' ', line[0].strip())
-    family = re.findall(familyRE, linha)
+    if line[0] not in processes:
+        processes.add(line[0])
 
-    if family:
-        withFamily += 1
+        linha = re.sub(r'( |\n)+', r' ', line[2].strip())
+        family = re.findall(familyRE, linha)
 
-        for relativeGroup in family:
-            grau = relativeGroup[2]
-            numFamiliares = 1
+        if family:
+            withFamily += 1
 
-            if isPlural(grau):
-                relatives = re.split(' e |, ', relativeGroup[1])
-                numFamiliares = len(relatives)
-                grau = toSingular(grau)
+            for relativeGroup in family:
+                grau = relativeGroup[2]
+                numFamiliares = 1
 
-            if grau in frequencyFamily:
-                frequencyFamily[grau] += numFamiliares
-            else:
-                frequencyFamily[grau] = numFamiliares
+                if isPlural(grau):
+                    relatives = re.split(' e |, ', relativeGroup[1])
+                    numFamiliares = len(relatives)
+                    grau = toSingular(grau)
 
-print("Numero de candidatos com parentes eclesiásticos: " + str(withFamily))
+                if grau in frequencyFamily:
+                    frequencyFamily[grau] += numFamiliares
+                else:
+                    frequencyFamily[grau] = numFamiliares
 
-print("Tipo de parentesco mais frequente: " +
-      max(frequencyFamily.items(), key=operator.itemgetter(1))[0])
+
+print("Numero de candidatos com parentes eclesiásticos: " + str(withFamily) + "\n")
+
+ff = dict(sorted(frequencyFamily.items(), key=lambda p: p[1], reverse=True))
+
+for item in ff.items():
+    print(str(item[0]) + ": " + str(item[1]))
+
+print("\nTipo de parentesco mais frequente: " +
+      max(frequencyFamily.items(), key=lambda p: p[1])[0])
