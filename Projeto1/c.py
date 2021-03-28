@@ -1,5 +1,4 @@
 import re
-import operator
 
 
 def isPlural(member):
@@ -16,14 +15,14 @@ obsRE = re.compile(
 familyRE = re.compile(r'((.+),(.+))\. Proc\.\d+')
 
 withFamily = 0
-frequencyFamily = {}
+frequencyFamily = dict()
 processes = set()
 
 with open("processos.xml") as f:
-    conteudo = f.read()
-    obs = re.findall(obsRE, conteudo)
+    file = f.read()
+    content = re.findall(obsRE, file)
 
-for line in obs:
+for line in content:
     if line[0] not in processes:
         processes.add(line[0])
 

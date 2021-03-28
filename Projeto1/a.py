@@ -23,23 +23,24 @@ def printDateRange(firstDate, lastDate):
           '\033[0m' + ' e ' '\033[1m' + lastDate + '\033[0m' + '.')
 
 
-file = open('processos.xml', 'r')
-
-next(file)
-next(file)
-
-numProcessesYear = {}
 minDate = '9999-99-99'
 maxDate = '0000-00-00'
+numProcessesYear = dict()
+processes = set()
 
-dataRE = re.compile(r'^<data>((\d{4})-\d{2}-\d{2})</data>')
+processRE = re.compile(
+    r'<processo id="(\d+)">(.|\n)*?<data>((\d{4})-\d{2}-\d{2})</data>')
 
-for line in file:
-    m = re.search(dataRE, line.strip())
+with open("processos.xml") as f:
+    file = f.read()
+    content = re.findall(processRE, file)
 
-    if m:
-        year = m.group(2)
-        date = m.group(1)
+for line in content:
+    if line[0] not in processes:
+        processes.add(line[0])
+
+        date = line[2]
+        year = line[3]
 
         if date < minDate:
             minDate = date
@@ -60,6 +61,3 @@ for item in numProcessesYear.items():
 
 printNumCent(numCent)
 printDateRange(minDate, maxDate)
-
-
-file.close()
