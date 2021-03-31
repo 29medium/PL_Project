@@ -12,7 +12,7 @@ def toSingular(plural):
 
 contentRE = re.compile(
     r'<processo id="(\d+)">(.|\n)*?(<obs>((.|\n)*?)</obs>|<obs/>)')
-familyRE = re.compile(r'((.+),(.+))\. Proc\.\d+')
+familyRE = re.compile(r'(([a-zA-Z, ]+),([A-Z][a-zA-Z ]+))\.[ ]?Proc\.\d+')
 
 withFamily = 0
 frequencyFamily = dict()
@@ -37,7 +37,7 @@ for line in content:
                 numFamiliares = 1
 
                 if isPlural(grau):
-                    relatives = re.split(' e |, ', relativeGroup[1])
+                    relatives = re.split(' e| e |, |,', relativeGroup[1])
                     numFamiliares = len(relatives)
                     grau = toSingular(grau)
 
