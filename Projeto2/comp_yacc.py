@@ -1,26 +1,61 @@
 # comp_yacc.py
-#
 
 import ply.yacc as yacc
-import sys
-
 from comp_lex import tokens
 
-def p_Comando_atribuir(p):
-    "Comando : id '=' Exp"
-    p.parser.vars[p[1]] = p[3]
+def p_Comando_declarar(p):
+    "Comando : Declarar"
 
-def p_Comando_atribuir_vazio(p):
-    "Comando : id"
-    p.parser.vars[p[1]] = 0
+def p_Comando_imprimir(p):
+    "Comando : Imprimir"
+
+def p_Comando_atribuir(p):
+    "Comando : Atribuir"
+
+def p_Declarar_exp(p):
+    "Declarar : int id '=' Exp ';'"
+
+    add_var(p[2], 1, p.parser.var)
+
+    fileOut.write("pushi " + str(p[4]) + "\n")
+
+def p_Declarar_vazio(p):
+    "Declarar : int id ';'"
+
+    add_var(p[2], 1, p.parser.var)
+
+    fileOut.write("pushi 0\n")
+
+def p_Imprimir(p):
+    "Imprimir : print id ';'"
+
+    index = get_index(p[2], p.parser.var)
+
+    if index != None:
+        fileOut.write("pushg " + str(index) + "\n")
+        fileOut.write("writei\n")
+
+def p_Atribuir_exp(p):
+    "Atribuir : id '=' Exp ';'"
+
+    index = get_index(p[1], p.parser.var)
+
+    if index != None:
+        fileOut.write(f"store {index}\n")
 
 def p_Exp_add(p):
     "Exp : Exp '+' Termo"
     p[0] = p[1] + p[3]
+    p.parser.intbuffer.append("pushi " + str(p[1]) + "\n")
+    p.parser.intbuffer.append("pushi " + str(p[3]) + "\n")
+    p.parser.operationbuffer.append("add\n")
 
 def p_Exp_sub(p):
     "Exp : Exp '-' Termo"
     p[0] = p[1] - p[3]
+    fileOut.write("pushi " + str(p[1]) + "\n")
+    fileOut.write("pushi " + str(p[3]) + "\n")
+    fileOut.write("sub\n")
 
 def p_Exp_termo(p):
     "Exp : Termo"
@@ -29,13 +64,29 @@ def p_Exp_termo(p):
 def p_Termo_mult(p):
     "Termo : Termo '*' Fator"
     p[0] = p[1] * p[3]
+    fileOut.write("pushi " + str(p[1]) + "\n")
+    fileOut.write("pushi " + str(p[3]) + "\n")
+    fileOut.write("mul\n")
 
 def p_Termo_div(p):
     "Termo : Termo '/' Fator"
     if p[3] != 0:
         p[0] = p[1] / p[3]
+        fileOut.write("pushi " + str(p[1]) + "\n")
+        fileOut.write("pushi " + str(p[3]) + "\n")
+        fileOut.write("div\n")
     else:
-        p.parser.success = False
+        print("Erro: Divisão por zero")
+
+
+def p_Termo_mod(p):
+    "Termo : Termo '%' Fator"
+    if p[3] != 0:
+        p[0] = p[1] % p[3]
+        fileOut.write("pushi " + str(p[1]) + "\n")
+        fileOut.write("pushi " + str(p[3]) + "\n")
+        fileOut.write("mod\n")
+    else:
         print("Erro: Divisão por zero")
 
 def p_Termo_fator(p):
@@ -55,21 +106,67 @@ def p_Fator_id(p):
     if p[1] in p.parser.vars:
         p[0] = p.parser.vars[p[1]]
     else:
-        p.parser.success = False
         print("Variável " + p[1] + " não definida")
 
 def p_error(p):
-    p.parser.success = False
     print("Syntax Error in input: ", p)
+
+# Programa
+
+def add_var(id, num, var):
+    if id not in var:
+        var[id] = num
+
+def get_index(id, var):
+    if id in var.keys():
+        index = 0
+        for key in var.keys():
+            if key == id:
+                break
+            else:
+                index += var[key]
+        return index
+    return None
+
+def flush(intbuffer, operationbuffer):
+    for i in intbuffer:
+        fileOut.write(i)
+    
+    for i in operationbuffer:
+        fileOut.write(i)
+
+r = 1
+while r:
+    inFilePath = input("Code File Path >> ")
+    
+    try:
+        fileIn = open(inFilePath, "r")
+        r = 0
+    except (FileNotFoundError, NotADirectoryError):
+        print("Wrong File Path\n")
+
+r = 1
+while r:
+    outFilePath = input("Output File Path >> ")
+
+    if outFilePath != inFilePath:
+        fileOut = open(outFilePath, "w")
+        r = 0
+    else:
+        print("Wrong File Path\n")
 
 parser = yacc.yacc()
 
-parser.vars = dict()
+parser.var = dict()
+parser.intbuffer = list()
+parser.operationbuffer = list()
 
-for linha in sys.stdin:
-    parser.success = True
-    result = parser.parse(linha)
-    if parser.success:
-        print("Resultado: " + str(result))
+fileOut.write("start\n")
 
-print(parser.vars)
+for linha in fileIn:
+    parser.parse(linha)
+
+fileOut.write("stop\n")
+
+fileIn.close()
+fileOut.close()
