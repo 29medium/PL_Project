@@ -1,7 +1,1 @@
-DECLARATIONS
-    int i;
-END
-
-INSTRUCTIONS
-    i = 1 * 20;
-END
+declarations begin int i=10; int j[10]; int x; end instructions begin input x; end

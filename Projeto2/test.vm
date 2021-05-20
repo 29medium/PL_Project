@@ -1,2 +1,8 @@
+pushi 10
+pushn 10
+pushi 0
 start
+read
+atoi
+storeg 11
 stop

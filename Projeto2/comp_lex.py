@@ -30,14 +30,19 @@ import ply.lex as lex
 reserved = {
     'int' : 'INT',
     'print' : 'PRINT',
-    'DECLARATIONS' : 'DECLARATIONS',
-    'INSTRUCTIONS' : 'INSTRUCTIONS',
-    'END' : 'END'
+    'input' : 'INPUT',
+    'declarations': 'DECLARATIONS',
+    'instructions': 'INSTRUCTIONS',
+    'begin' : 'BEGIN',
+    'end': 'END',
+    'if' : 'IF',
+    'elif' : 'ELSEIF',
+    'else' : 'ELSE'
 }
 
 tokens = ['ID', 'NUM'] + list(reserved.values())
-literals = ['+', '-', '*', '/', '%', '(', ')', '=', ';']
- 
+literals = ['+', '-', '*', '/', '%', '(', ')', '[', ']', '=', ';']
+
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
     t.type = reserved.get(t.value,'ID')
@@ -51,18 +56,15 @@ def t_NUM(t):
 t_ignore = " \t\n"
 
 def t_error(t):
-    print("Caráter ilegal: ", t.value[0])
+    print("Illegal character: ", t.value[0])
     t.lexer().skip(1)
 
 lexer = lex.lex()
 
-file = open('test','r')
-
-#tok = lexer.token()
-
-for line in file:
-    lexer.input(line)
-    tok = lexer.token()
-    while tok:
-        print(tok)
-        tok = lexer.token()
+# file = open('test','r')
+# for line in file:
+#     lexer.input(line)
+#     tok = lexer.token()
+#     while tok:
+#         print(tok)
+#         tok = lexer.token()

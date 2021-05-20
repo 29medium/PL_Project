@@ -3,154 +3,228 @@
 import ply.yacc as yacc
 from comp_lex import tokens
 
-# DECLARATIONS
+# -----------------------------------------------------------------
+#                              TYPE
+# -----------------------------------------------------------------
 
-def p_Type_declaration(p):
-    "Type : DECLARATIONS Declarations END"
+def p_Type(p):
+    "Type : TypeDeclarations TypeInstructions"
 
-def p_Declarations(p):
+    fileOut.write(f"{p[1]}start\n{p[2]}stop\n")
+
+def p_Type_declarations(p):
+    "TypeDeclarations : DECLARATIONS BEGIN Declarations END"
+
+    p[0] = p[3]
+
+def p_Type_instructions(p):
+    "TypeInstructions : INSTRUCTIONS BEGIN Instructions END"
+
+    p[0] = p[3]
+
+# -----------------------------------------------------------------
+#                         DECLARATIONS
+# -----------------------------------------------------------------
+
+def p_Declarations(p):    
     "Declarations : Declarations Declaration"
 
-def p_Declarations_simple(p):
-    "Declarations : Declaration"
+    p[0] = p[1] + p[2]
 
 def p_Declarations_empty(p):
     "Declarations : "
 
+    p[0] = ""
+
 def p_Declararation_exp(p):
     "Declaration : INT ID '=' Exp ';'"
 
-    add_var(p[2], 1, p.parser.var)
+    add_var(p[2], 1, p)
 
-    fileOut.write("pushi " + str(p[4]) + "\n")
+    p[0] = p[4]
 
 def p_Declararation_simple(p):
     "Declaration : INT ID ';'"
 
-    add_var(p[2], 1, p.parser.var)
+    add_var(p[2], 1, p)
 
-    fileOut.write("pushi 0\n")
+    p[0] = "pushi 0\n"
 
-# INSTRUCTIONS
 
-def p_Type_instruction(p):
-   "Type : INSTRUCTIONS Instructions END"
+def p_Declararation_array(p):
+    "Declaration : INT ID '[' NUM ']' ';'"
+
+    add_var(p[2], int(p[4]), p)
+
+    p[0] = f"pushn {p[4]}\n"
+
+# -----------------------------------------------------------------
+#                         INSTRUCTIONS
+# -----------------------------------------------------------------
 
 def p_Instructions(p):
     "Instructions : Instructions Instruction"
 
-def p_Instructions_simple(p):
-    "Instructions : Instruction"
+    p[0] = p[1] + p[2]
 
 def p_Instructions_empty(p):
     "Instructions : "
 
-def p_Imprimir(p):
+    p[0] = ""
+
+# -----------------------------------------------------------------
+#                           INPUT
+# -----------------------------------------------------------------
+
+def p_Read(p):
+    "Instruction : INPUT ID ';'"
+
+    (size, offset) = get_index(p[2], p)
+
+    if size == 1:
+        p[0] = f"read\natoi\nstoreg {offset}\n"
+
+
+def p_Print_array(p):
+    "Instruction : INPUT ID '[' NUM ']' ';'"
+    (size, offset) = get_index(p[2], p)
+
+    if int(p[4]) < size and int(p[4]) >= 0:
+        index = offset + int(p[4])
+        p[0] = f"read\natoi\nstoreg {index}\n"
+    
+# -----------------------------------------------------------------
+#                         PRINT
+# -----------------------------------------------------------------
+
+def p_Print(p):
     "Instruction : PRINT ID ';'"
 
-    index = get_index(p[2], p.parser.var)
+    (size,offset) = get_index(p[2], p)
 
-    if index != None:
-        fileOut.write("pushg " + str(index) + "\n")
-        fileOut.write("writei\n")
+    if size == 1:
+        p[0] = f"pushg {offset}\nwritei\n"
+    else:
+        p[0] = ""
+        for i in range(offset,offset + size):
+            p[0] += f"pushg {i}\nwritei\n"
 
-def p_Atribuir_exp(p):
+def p_Print_array(p):
+    "Instruction : PRINT ID '[' NUM ']' ';'"
+    (size, offset) = get_index(p[2], p)
+
+    if int(p[4]) < size and int(p[4]) >= 0:
+        index = offset + int(p[4])
+        p[0] = f"pushg {index}\nwritei\n"
+
+# -----------------------------------------------------------------
+#                         ATTRIBUTE
+# -----------------------------------------------------------------
+
+def p_Attribure(p):
     "Instruction : ID '=' Exp ';'"
 
-    index = get_index(p[1], p.parser.var)
+    (size,offset) = get_index(p[1], p)
 
-    if index != None:
-        fileOut.write(f"store {index}\n")
+    if size == 1:
+        p[0] = f"{p[3]}storeg {offset}\n"
+
+def p_Attribure_array(p):
+    "Instruction : ID '[' NUM ']' '=' Exp ';'"
+
+    (size, offset) = get_index(p[1], p)
+
+    if int(p[3]) < size and int(p[3]) >= 0:
+        index = offset + int(p[3])
+        p[0] = f"{p[6]}storeg {index}\n"
+
+# -----------------------------------------------------------------
+#                              IF
+# -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
+#                           REPEAT
+# -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
+#                       EXP TERM FACTOR
+# -----------------------------------------------------------------
 
 def p_Exp_add(p):
-    "Exp : Exp '+' Termo"
-    p[0] = p[1] + p[3]
-    p.parser.intbuffer.append("pushi " + str(p[1]) + "\n")
-    p.parser.intbuffer.append("pushi " + str(p[3]) + "\n")
-    p.parser.operationbuffer.append("add\n")
+    "Exp : Exp '+' Term"
+    p[0] = p[1] + p[3] + "add\n"
 
 def p_Exp_sub(p):
-    "Exp : Exp '-' Termo"
-    p[0] = p[1] - p[3]
-    fileOut.write("pushi " + str(p[1]) + "\n")
-    fileOut.write("pushi " + str(p[3]) + "\n")
-    fileOut.write("sub\n")
+    "Exp : Exp '-' Term"
+    p[0] = p[1] + p[3] + "sub\n"
 
-def p_Exp_termo(p):
-    "Exp : Termo"
+def p_Exp_term(p):
+    "Exp : Term"
     p[0] = p[1]
 
-def p_Termo_mult(p):
-    "Termo : Termo '*' Fator"
-    p[0] = p[1] * p[3]
-    fileOut.write("pushi " + str(p[1]) + "\n")
-    fileOut.write("pushi " + str(p[3]) + "\n")
-    fileOut.write("mul\n")
+def p_Term_mult(p):
+    "Term : Term '*' Factor"
+    p[0] = p[1] + p[3] + "mul\n"
 
-def p_Termo_div(p):
-    "Termo : Termo '/' Fator"
+def p_Term_div(p):
+    "Term : Term '/' Factor"
     if p[3] != 0:
-        p[0] = p[1] / p[3]
-        fileOut.write("pushi " + str(p[1]) + "\n")
-        fileOut.write("pushi " + str(p[3]) + "\n")
-        fileOut.write("div\n")
+        p[0] = p[1] + p[3] + "div\n"
     else:
-        print("Erro: Divisão por zero")
+        p[0] = p[1] + "pushi 1\ndiv\n"
 
-
-def p_Termo_mod(p):
-    "Termo : Termo '%' Fator"
+def p_Term_mod(p):
+    "Term : Term '%' Factor"
     if p[3] != 0:
-        p[0] = p[1] % p[3]
-        fileOut.write("pushi " + str(p[1]) + "\n")
-        fileOut.write("pushi " + str(p[3]) + "\n")
-        fileOut.write("mod\n")
+        p[0] = p[1] + p[3] + "mod\n"
     else:
-        print("Erro: Divisão por zero")
+        p[0] = p[1] + "pushi 1\nmod\n"
 
 def p_Termo_fator(p):
-    "Termo : Fator"
+    "Term : Factor"
+    p[0] = p[1]
 
-def p_Fator_par(p):
-    "Fator : '(' Exp ')'"
-    
-def p_Fator_num(p):
-    "Fator : NUM"
-    # Passar o numero
+def p_Factor_par(p):
+    "Factor : '(' Exp ')'"
+    p[0] = p[2]
 
-def p_Fator_id(p):
-    "Fator : ID"
-    if p[1] in p.parser.vars:
-        p[0] = p.parser.vars[p[1]]
-    else:
-        print("Variável " + p[1] + " não definida")
+def p_Factor_num(p):
+    "Factor : NUM"
+    p[0] = f"pushi {p[1]}\n"
+
+def p_Factor_id(p):
+    "Factor : ID"
+    (_, offset) = get_index(p[1], p)
+    p[0] = f"pushg {offset}\n"
+
+def p_Factor_id_array(p):
+    "Factor : ID '[' NUM ']'"
+    (size, offset) = get_index(p[1], p)
+
+    if int(p[2]) < size and int(p[3]) >=0:
+        index = offset+p[3]
+        p[0] = f"pushg {index}\n"
+
+
+# -----------------------------------------------------------------
+#                         OTHER
+# -----------------------------------------------------------------
 
 def p_error(p):
     print("Syntax Error in input: ", p)
 
-# Programa
+def add_var(id, size, p):
+    if id not in p.parser.var.keys():
+        p.parser.var[id] = (size, p.parser.offset)
+        p.parser.offset += size
 
-def add_var(id, num, var):
-    if id not in var:
-        var[id] = num
+def get_index(id, p):
+    if id in p.parser.var.keys():
+        return p.parser.var[id]
 
-def get_index(id, var):
-    if id in var.keys():
-        index = 0
-        for key in var.keys():
-            if key == id:
-                break
-            else:
-                index += var[key]
-        return index
-    return None
-
-def flush(intbuffer, operationbuffer):
-    for i in intbuffer:
-        fileOut.write(i)
-    
-    for i in operationbuffer:
-        fileOut.write(i)
+# -----------------------------------------------------------------
+#                         RUN
+# -----------------------------------------------------------------
 
 r = 1
 while r:
@@ -174,16 +248,11 @@ while r:
 
 parser = yacc.yacc()
 
-parser.var = dict()
-parser.intbuffer = list()
-parser.operationbuffer = list()
-
-fileOut.write("start\n")
+parser.var = dict() # x => (size, offset)
+parser.offset = 0
 
 for linha in fileIn:
     parser.parse(linha)
-
-fileOut.write("stop\n")
 
 fileIn.close()
 fileOut.close()
