@@ -1,8 +1,11 @@
-pushi 10
-pushn 10
 pushi 0
+pushn 10
+pushn 25
 start
-read
-atoi
-storeg 11
+pushi 2
+storeg 0
+pushi 5
+storeg 2
+pushi 1
+storeg 30
 stop

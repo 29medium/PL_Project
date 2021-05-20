@@ -31,17 +31,23 @@ reserved = {
     'int' : 'INT',
     'print' : 'PRINT',
     'input' : 'INPUT',
+    'begin' : 'BEGIN',
+    'then' : 'THEN',
+    'end': 'END',
     'declarations': 'DECLARATIONS',
     'instructions': 'INSTRUCTIONS',
-    'begin' : 'BEGIN',
-    'end': 'END',
     'if' : 'IF',
-    'elif' : 'ELSEIF',
-    'else' : 'ELSE'
+    'else' : 'ELSE',
+    'repeat' : 'REPEAT',
+    'until' : 'UNTIL',
+    'and' : 'AND',
+    'or' : 'OR',
+    'not' : 'NOT'
 }
 
-tokens = ['ID', 'NUM'] + list(reserved.values())
-literals = ['+', '-', '*', '/', '%', '(', ')', '[', ']', '=', ';']
+tokens = ['ID', 'NUM', 'PLUS', 'MINUS', 'MUL', 'DIV', 'MOD', 'EQ',
+          'NE', 'G', 'GE', 'L', 'LE', 'ATTR'] + list(reserved.values())
+literals = ['(', ')', '[', ']',';']
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -51,6 +57,66 @@ def t_ID(t):
 def t_NUM(t):
     r'\-?\d+'
     t.type = reserved.get(t.value, 'NUM')
+    return t
+
+def t_PLUS(t):
+    r'\+'
+    t.type = reserved.get(t.value, 'PLUS')
+    return t
+
+def t_MINUS(t):
+    r'\-'
+    t.type = reserved.get(t.value, 'MINUS')
+    return t
+
+def t_MUL(t):
+    r'\*'
+    t.type = reserved.get(t.value, 'MUL')
+    return t
+
+def t_DIV(t):
+    r'/'
+    t.type = reserved.get(t.value, 'DIV')
+    return t
+
+def t_MOD(t):
+    r'%'
+    t.type = reserved.get(t.value, 'MOD')
+    return t
+
+def t_EQ(t):
+    r'=='
+    t.type = reserved.get(t.value, 'EQ')
+    return t
+
+def t_NE(t):
+    r'!='
+    t.type = reserved.get(t.value, 'NE')
+    return t
+
+def t_G(t):
+    r'>'
+    t.type = reserved.get(t.value, 'G')
+    return t
+
+def t_GE(t):
+    r'>='
+    t.type = reserved.get(t.value, 'GE')
+    return t
+
+def t_L(t):
+    r'<'
+    t.type = reserved.get(t.value, 'L')
+    return t
+
+def t_LE(t):
+    r'<='
+    t.type = reserved.get(t.value, 'LE')
+    return t
+
+def t_ATTR(t):
+    r'='
+    t.type = reserved.get(t.value, 'ATTR')
     return t
 
 t_ignore = " \t\n"
