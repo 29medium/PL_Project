@@ -3,31 +3,50 @@
 import ply.yacc as yacc
 from comp_lex import tokens
 
-def p_Comando_declarar(p):
-    "Comando : Declarar"
+# DECLARATIONS
 
-def p_Comando_imprimir(p):
-    "Comando : Imprimir"
+def p_Type_declaration(p):
+    "Type : DECLARATIONS Declarations END"
 
-def p_Comando_atribuir(p):
-    "Comando : Atribuir"
+def p_Declarations(p):
+    "Declarations : Declarations Declaration"
 
-def p_Declarar_exp(p):
-    "Declarar : int id '=' Exp ';'"
+def p_Declarations_simple(p):
+    "Declarations : Declaration"
+
+def p_Declarations_empty(p):
+    "Declarations : "
+
+def p_Declararation_exp(p):
+    "Declaration : INT ID '=' Exp ';'"
 
     add_var(p[2], 1, p.parser.var)
 
     fileOut.write("pushi " + str(p[4]) + "\n")
 
-def p_Declarar_vazio(p):
-    "Declarar : int id ';'"
+def p_Declararation_simple(p):
+    "Declaration : INT ID ';'"
 
     add_var(p[2], 1, p.parser.var)
 
     fileOut.write("pushi 0\n")
 
+# INSTRUCTIONS
+
+def p_Type_instruction(p):
+   "Type : INSTRUCTIONS Instructions END"
+
+def p_Instructions(p):
+    "Instructions : Instructions Instruction"
+
+def p_Instructions_simple(p):
+    "Instructions : Instruction"
+
+def p_Instructions_empty(p):
+    "Instructions : "
+
 def p_Imprimir(p):
-    "Imprimir : print id ';'"
+    "Instruction : PRINT ID ';'"
 
     index = get_index(p[2], p.parser.var)
 
@@ -36,7 +55,7 @@ def p_Imprimir(p):
         fileOut.write("writei\n")
 
 def p_Atribuir_exp(p):
-    "Atribuir : id '=' Exp ';'"
+    "Instruction : ID '=' Exp ';'"
 
     index = get_index(p[1], p.parser.var)
 
@@ -91,18 +110,16 @@ def p_Termo_mod(p):
 
 def p_Termo_fator(p):
     "Termo : Fator"
-    p[0] = p[1]
 
 def p_Fator_par(p):
     "Fator : '(' Exp ')'"
-    p[0] = p[2]
-
+    
 def p_Fator_num(p):
-    "Fator : num"
-    p[0] = int(p[1])
+    "Fator : NUM"
+    # Passar o numero
 
 def p_Fator_id(p):
-    "Fator : id"
+    "Fator : ID"
     if p[1] in p.parser.vars:
         p[0] = p.parser.vars[p[1]]
     else:

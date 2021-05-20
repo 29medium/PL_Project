@@ -1,10 +1,12 @@
 # comp_lex.py
 #
-# Comando -> Atribuir | Imprimir
+# Type -> Declaration | Instruction
 #
-# Declarar -> int id '=' num ';'
-#           | int id ';'
-#           | int id '[' num ']' ';'
+# Declaration -> Declarationaux
+#
+# Declarationaux -> int id '=' num ';'
+#                 | int id ';'
+#                 | int id '[' num ']' ';'
 #
 # Imprimir -> print id ';'
 #
@@ -25,13 +27,27 @@
 
 import ply.lex as lex
 
-tokens = ['id', 'num', 'int', 'print']
+reserved = {
+    'int' : 'INT',
+    'print' : 'PRINT',
+    'DECLARATIONS' : 'DECLARATIONS',
+    'INSTRUCTIONS' : 'INSTRUCTIONS',
+    'END' : 'END'
+}
+
+tokens = ['ID', 'NUM'] + list(reserved.values())
 literals = ['+', '-', '*', '/', '%', '(', ')', '=', ';']
  
-t_num = r'\-?\d+'
-t_int = r'int'
-t_print = r'print'
-t_id = r'\w'
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z0-9_]*'
+    t.type = reserved.get(t.value,'ID')
+    return t
+
+def t_NUM(t):
+    r'\-?\d+'
+    t.type = reserved.get(t.value, 'NUM')
+    return t
+
 t_ignore = " \t\n"
 
 def t_error(t):
@@ -39,3 +55,14 @@ def t_error(t):
     t.lexer().skip(1)
 
 lexer = lex.lex()
+
+file = open('test','r')
+
+#tok = lexer.token()
+
+for line in file:
+    lexer.input(line)
+    tok = lexer.token()
+    while tok:
+        print(tok)
+        tok = lexer.token()
