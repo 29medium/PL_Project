@@ -1,16 +1,18 @@
-declarations
-    int N=10;
-    int i;
-    int arr[10];
-end
-instructions
-    repeat
-        input arr[i];
-        i = i + 1;
-    until(i==N) end
+def main
+    declarations
+        int N=10;
+        int i;
+        int arr[10];
+    end
+    instructions
+        repeat
+            input arr[i];
+            i = i + 1;
+        until(i==N) end
 
-    repeat
-        i = i - 1;
-        print arr[i];
-    until(i==0) end
+        repeat
+            i = i - 1;
+            print arr[i];
+        until(i==0) end
+    end
 end

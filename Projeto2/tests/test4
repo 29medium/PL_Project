@@ -1,19 +1,21 @@
-declarations
-    int N;
-    int aux;
-    int counter;
-end
-instructions
-    input N;
-    if(N>0) then
-        repeat
-            input aux;
-            if(aux % 2) then
-                print aux;
-                counter = counter + 1;
-            end
-            N = N-1;
-        until(N==0) end
-        print counter;
+def main
+    declarations
+        int N;
+        int aux;
+        int counter;
     end
-end 
+    instructions
+        input N;
+        if(N>0) then
+            repeat
+                input aux;
+                if(aux % 2) then
+                    print aux;
+                    counter = counter + 1;
+                end
+                N = N-1;
+            until(N==0) end
+            print counter;
+        end
+    end 
+end

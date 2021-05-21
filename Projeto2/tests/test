@@ -1,0 +1,20 @@
+def main
+    declarations
+        int x;
+        int i;
+    end
+    instructions 
+        while (i<10) do
+            print i;
+            i=i+1;
+        end
+        for (i=0; i<10; i=i+1) do
+            print i;
+        end
+        i=0;
+        repeat
+            print i;
+            i=i+1;
+        until(i==10) end
+    end
+end

@@ -1,13 +1,15 @@
-declarations
-    int i;
-    int tamanho = 4;
-    int lados[4];
-end
-instructions
-    repeat
-        input lados[i];
-        i = i + 1;
-    until (i == tamanho) end
+def main
+    declarations
+        int i;
+        int tamanho = 4;
+        int lados[4];
+    end
+    instructions
+        repeat
+            input lados[i];
+            i = i + 1;
+        until (i==tamanho) end
 
-    print lados[0]==lados[1] and lados[0]==lados[2] and lados[0]==lados[3];
+        print lados[0]==lados[1] and lados[0]==lados[2] and lados[0]==lados[3];
+    end
 end

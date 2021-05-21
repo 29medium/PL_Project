@@ -12,18 +12,81 @@ reserved = {
     'else' : 'ELSE',
     'repeat' : 'REPEAT',
     'until' : 'UNTIL',
+    'while' : 'WHILE',
+    'for' : 'FOR',
+    'do' : 'DO',
     'and' : 'AND',
     'or' : 'OR',
-    'not' : 'NOT'
+    'not' : 'NOT',
+    'def' : 'DEF',
+    'main' : 'MAIN'
 }
 
-tokens = ['ID', 'PLUS', 'MINUS', 'MUL', 'DIV', 'MOD', 'EQ',
-          'NE', 'G', 'GE', 'L', 'LE', 'ATTR', 'NUM'] + list(reserved.values())
-literals = ['(', ')', '[', ']',';','"','"']
+tokens = ['ID', 'PLUS', 'MINUS', 'MUL', 'DIV', 'MOD', 'EQ', 'NE', 'G', 'GE', 'L', 'LE', 'LPAR', 'RPAR', 'LBRA', 'RBRA', 'SC', 'C', 'ATTR', 'NUM'] + list(reserved.values())
+
+def t_LPAR(t):
+    r'\('
+    t.type = reserved.get(t.value, 'LPAR')
+    return t
+
+def t_RPAR(t):
+    r'\)'
+    t.type = reserved.get(t.value, 'RPAR')
+    return t
+
+def t_LBRA(t):
+    r'\['
+    t.type = reserved.get(t.value, 'LBRA')
+    return t
+
+def t_RBRA(t):
+    r'\]'
+    t.type = reserved.get(t.value, 'RBRA')
+    return t
+
+def t_SC(t):
+    r';'
+    t.type = reserved.get(t.value, 'SC')
+    return t
+
+def t_C(t):
+    r','
+    t.type = reserved.get(t.value, 'C')
+    return t
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
     t.type = reserved.get(t.value,'ID')
+    return t
+
+def t_GE(t):
+    r'>='
+    t.type = reserved.get(t.value, 'GE')
+    return t
+
+def t_G(t):
+    r'>'
+    t.type = reserved.get(t.value, 'G')
+    return t
+
+def t_LE(t):
+    r'<='
+    t.type = reserved.get(t.value, 'LE')
+    return t
+
+def t_L(t):
+    r'<'
+    t.type = reserved.get(t.value, 'L')
+    return t
+
+def t_EQ(t):
+    r'=='
+    t.type = reserved.get(t.value, 'EQ')
+    return t
+
+def t_NE(t):
+    r'!='
+    t.type = reserved.get(t.value, 'NE')
     return t
 
 def t_PLUS(t):
@@ -49,36 +112,6 @@ def t_DIV(t):
 def t_MOD(t):
     r'%'
     t.type = reserved.get(t.value, 'MOD')
-    return t
-
-def t_EQ(t):
-    r'=='
-    t.type = reserved.get(t.value, 'EQ')
-    return t
-
-def t_NE(t):
-    r'!='
-    t.type = reserved.get(t.value, 'NE')
-    return t
-
-def t_G(t):
-    r'>'
-    t.type = reserved.get(t.value, 'G')
-    return t
-
-def t_GE(t):
-    r'>='
-    t.type = reserved.get(t.value, 'GE')
-    return t
-
-def t_L(t):
-    r'<'
-    t.type = reserved.get(t.value, 'L')
-    return t
-
-def t_LE(t):
-    r'<='
-    t.type = reserved.get(t.value, 'LE')
     return t
 
 def t_ATTR(t):
