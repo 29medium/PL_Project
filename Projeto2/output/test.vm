@@ -1,0 +1,37 @@
+pushn 8
+pushn 2
+start
+
+pushgp
+pushi 0
+padd
+pushi 1
+pushi 2
+mul
+pushi 0
+add
+read
+atoi
+storen
+pushgp
+pushi 0
+padd
+pushi 1
+pushi 2
+mul
+pushi 1
+add
+pushi 1
+storen
+pushgp
+pushgp
+pushi 0
+padd
+pushi 2
+pushi 2
+mul
+pushi 1
+add
+loadn
+writei
+stop

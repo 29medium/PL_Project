@@ -1,0 +1,25 @@
+declarations
+    int N;
+    int num;
+    int min;
+end
+instructions
+    input N;
+
+    if(N>0) then
+        input min;
+        N = N - 1;
+
+        if(N>0) then
+            repeat
+                input num;
+                if(num<min) then
+                    min = num;
+                end
+                N = N - 1;
+            until (N==0) end
+        end
+
+        print min;
+    end
+end

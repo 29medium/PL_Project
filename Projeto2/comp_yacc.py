@@ -13,14 +13,14 @@ def p_Type(p):
     fileOut.write(f"{p[1]}start\n{p[2]}stop\n")
 
 def p_Type_declarations(p):
-    "TypeDeclarations : DECLARATIONS BEGIN Declarations END"
+    "TypeDeclarations : DECLARATIONS Declarations END"
 
-    p[0] = p[3]
+    p[0] = p[2]
 
 def p_Type_instructions(p):
-    "TypeInstructions : INSTRUCTIONS BEGIN Instructions END"
+    "TypeInstructions : INSTRUCTIONS Instructions END"
 
-    p[0] = p[3]
+    p[0] = p[2]
 
 # -----------------------------------------------------------------
 #                         DECLARATIONS
@@ -39,7 +39,7 @@ def p_Declarations_empty(p):
 def p_Declararation_exp(p):
     "Declaration : INT ID ATTR Exp ';'"
 
-    add_var(p[2], 1, p)
+    add_var(p[2], 1, 1, p)
 
     p[0] = p[4]
 
@@ -51,15 +51,16 @@ def p_Declararation_simple(p):
     p[0] = "pushi 0\n"
 
 
-def p_Declararation_array(p):
+def p_Declararation_array_num(p):
     "Declaration : INT ID '[' NUM ']' ';'"
 
-    add_var(p[2], int(p[4]), 1, p)
+    col = int(p[4])
+    add_var(p[2], col, 1, p)
 
-    p[0] = f"pushn {p[4]}\n"
+    p[0] = f"pushn {col}\n"
 
 
-def p_Declararation_matrix(p):
+def p_Declararation_matrix_num(p):
     "Declaration : INT ID '[' NUM ']' '[' NUM ']' ';'"
 
     add_var(p[2], int(p[7]), int(p[4]), p)
@@ -85,98 +86,45 @@ def p_Instructions_empty(p):
 #                           INPUT
 # -----------------------------------------------------------------
 
-def p_Read_num(p):
+def p_Read_id(p):
     "Instruction : INPUT ID ';'"
 
     res = get_index(p[2], p)
 
-    if res:
-        (col, line, offset) = res
-        if col == 1 and line == 1 and res:
-            p[0] = f"read\natoi\nstoreg {offset}\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    (_, _, offset) = res
+    p[0] = f"read\natoi\nstoreg {offset}\n"
 
 def p_Read_array(p):
-    "Instruction : INPUT ID '[' NUM ']' ';'"
+    "Instruction : INPUT ID '[' Exp ']' ';'"
 
     res = get_index(p[2], p)
 
-    if res:
-        (col, line, offset) = res
-        if col > int(p[4]) and int(p[4]) >= 0 and line == 1:
-            offset = offset + int(p[4])
-            p[0] = f"read\natoi\nstoreg {offset}\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    (_, _, offset) = res
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[4]}read\natoi\nstoren\n"
     
 def p_Read_matrix(p):
-    "Instruction : INPUT ID '[' NUM ']' '[' NUM ']' ';'"
+    "Instruction : INPUT ID '[' Exp ']' '[' Exp ']' ';'"
 
     res = get_index(p[2], p)
 
-    if res:
-        (col, line, offset) = res
-        if col > int(p[7]) and int(p[7]) >= 0 and line > int(p[4]) and int(p[4]) >= 0:
-            offset = offset + int(p[4])*col + int(p[7])
-            p[0] = f"read\natoi\nstoreg {offset}\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    (col, _, offset) = res
+    p[0] = f"\npushgp\npushi {offset}\npadd\n{p[4]}pushi {col}\nmul\n{p[7]}add\nread\natoi\nstoren\n"
+
 
 # -----------------------------------------------------------------
 #                         PRINT
 # -----------------------------------------------------------------
 
-def p_Print_num(p):
-    "Instruction : PRINT ID ';'"
+def p_Print_Exp(p):
+    "Instruction : PRINT Exp ';'"
 
-    res = get_index(p[2], p)
-
-    if res:
-        (col, line, offset) = res
-        if col == 1 and line == 1 and res:
-            p[0] = f"pushg {offset}\nwritei\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
-
-def p_Print_array(p):
-    "Instruction : PRINT ID '[' NUM ']' ';'"
-
-    res = get_index(p[2], p)
-
-    if res:
-        (col, line, offset) = res
-        if col > int(p[4]) and int(p[4]) >= 0 and line == 1:
-            offset = offset + int(p[4])
-            p[0] = f"pushg {offset}\nwritei\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    p[0] = f"{p[2]}writei\n"
 
 
-def p_Print_matrix(p):
-    "Instruction : PRINT ID '[' NUM ']' '[' NUM ']' ';'"
+def p_Print_Log(p):
+    "Instruction : PRINT Log ';'"
 
-    res = get_index(p[2], p)
-
-    if res:
-        (col, line, offset) = res
-        if col > int(p[7]) and int(p[7]) >= 0 and line > int(p[4]) and int(p[4]) >= 0:
-            offset = offset + int(p[4])*col + int(p[7])
-            p[0] = f"pushg {offset}\nwritei\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    p[0] = f"{p[2]}writei\n"
 
 # -----------------------------------------------------------------
 #                         ATTRIBUTE
@@ -187,45 +135,28 @@ def p_Attribure(p):
 
     res = get_index(p[1], p)
 
-    if res:
-        (col, line, offset) = res
-        if col == 1 and line == 1 and res:
-            p[0] = f"{p[3]}storeg {offset}\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    (_, _, offset) = res
+    p[0] = f"{p[3]}storeg {offset}\n"
+
 
 def p_Attribure_array(p):
-    "Instruction : ID '[' NUM ']' ATTR Exp ';'"
+    "Instruction : ID '[' Exp ']' ATTR Exp ';'"
 
     res = get_index(p[1], p)
+    
+    (_, _, offset) = res
 
-    if res:
-        (col, line, offset) = res
-        if col > int(p[3]) and int(p[3]) >= 0 and line == 1:
-            offset = offset + int(p[3])
-            p[0] = f"{p[6]}storeg {offset}\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}{p[6]}storen\n"
 
 
 def p_Attribure_matrix(p):
-    "Instruction : ID '[' NUM ']' '[' NUM ']' ATTR Exp ';'"
+    "Instruction : ID '[' Exp ']' '[' Exp ']' ATTR Exp ';'"
 
     res = get_index(p[1], p)
 
-    if res:
-        (col, line, offset) = res
-        if col > int(p[6]) and int(p[6]) >= 0 and line > int(p[3]) and int(p[3]) >= 0:
-            offset = offset + int(p[3])*col + int(p[6])
-            p[0] = f"{p[9]}storeg {offset}\n"
-        else:
-            p[0] = ""
-    else:
-        p[0] = ""
+    (col, _, offset) = res
+
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}pushi {col}\nmul\n{p[6]}add\n{p[9]}storen\n"
 
 # -----------------------------------------------------------------
 #                              IF
@@ -238,7 +169,7 @@ def p_Condition(p):
 
 def p_Condition_simple(p):
     "Instruction : IF Rel THEN Instructions END"
-    p[0] = f"{p[2]}jump end_if{p.parser.ifs}\n{p[4]}\nendif{p.parser.ifs}:\n"
+    p[0] = f"{p[2]}jz endif{p.parser.ifs}\n{p[4]}\nendif{p.parser.ifs}:\n"
     p.parser.ifs += 1
 
 def p_Condition_Else(p):
@@ -260,16 +191,16 @@ def p_Cycle(p):
 
 def p_Log_and(p):
     "Log : Log AND Rel"
-    p[0] = p[1] + p[3] + "and\n"
+    p[0] = f"{p[1]}{p[3]}equal\npushi 1\nequal\n"
 
 
 def p_Log_or(p):
     "Log : Log OR Rel"
-    p[0] = p[1] + p[3] + "or\n"
+    p[0] = f"{p[1]}{p[3]}equal\npushi 0\nequal\nnot\n"
 
 def p_Log_not(p):
     "Log : NOT Log"
-    p[0] = p[2] + "not\n" 
+    p[0] = "{p[2]}not\n"
 
 def p_Log_Rel(p):
     "Log : Rel"
@@ -277,7 +208,7 @@ def p_Log_Rel(p):
 
 def p_Rel_eq(p):
     "Rel : Rel EQ LExp"
-    p[0] = p[1] + p[3] + "equal\n"
+    p[0] = f"{p[1]}{p[3]}equal\n"
 
 
 def p_Rel_ne(p):
@@ -363,17 +294,28 @@ def p_LFactor_num(p):
 
 def p_LFactor_id(p):
     "LFactor : ID"
-    (_, offset) = get_index(p[1], p)
+    res = get_index(p[1], p)
+
+    (_, _, offset) = res
     p[0] = f"pushg {offset}\n"
 
 
-def p_LFactor_id_array(p):
-    "LFactor : ID '[' NUM ']'"
-    (size, offset) = get_index(p[1], p)
+def p_LFactor_array(p):
+    "LFactor : ID '[' Exp ']'"
 
-    if int(p[2]) < size and int(p[3]) >= 0:
-        index = offset+p[3]
-        p[0] = f"pushg {index}\n"
+    res = get_index(p[1], p)
+
+    (_, _, offset) = res
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}loadn\n"
+
+
+def p_LFactor_matrix(p):
+    "LFactor : ID '[' Exp ']' '[' Exp ']'"
+
+    res = get_index(p[1], p)
+
+    (col, _, offset) = res
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}pushi {col}\nmul\n{p[6]}add\nloadn\n"
 
 # -----------------------------------------------------------------
 #                    ARITHMETIC OPERATIONS
@@ -423,17 +365,27 @@ def p_Factor_num(p):
 
 def p_Factor_id(p):
     "Factor : ID"
-    (_, offset) = get_index(p[1], p)
+    res = get_index(p[1], p)
+
+    (_, _, offset) = res
     p[0] = f"pushg {offset}\n"
 
-def p_Factor_id_array(p):
-    "Factor : ID '[' NUM ']'"
-    (size, offset) = get_index(p[1], p)
+def p_Factor_array(p):
+    "Factor : ID '[' Exp ']'"
 
-    if int(p[2]) < size and int(p[3]) >=0:
-        index = offset+p[3]
-        p[0] = f"pushg {index}\n"
+    res = get_index(p[1], p)
 
+    (_, _, offset) = res
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}loadn\n"
+
+def p_Factor_matrix(p):
+    "Factor : ID '[' Exp ']' '[' Exp ']'"
+
+    res = get_index(p[1], p)
+
+    (col, _, offset) = res
+    p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}pushi {col}\nmul\n{p[6]}add\nloadn\n"
+    
 
 # -----------------------------------------------------------------
 #                         OTHER
@@ -470,8 +422,11 @@ while r:
     outFilePath = input("Output File Path >> ")
 
     if outFilePath != inFilePath:
-        fileOut = open(outFilePath, "w")
-        r = 0
+        try:
+            fileOut = open(outFilePath, "w")
+            r = 0
+        except (FileNotFoundError, NotADirectoryError):
+            print("Wrong File Path\n")
     else:
         print("Wrong File Path\n")
 
@@ -482,8 +437,8 @@ parser.offset = 0
 parser.ifs = 0
 parser.cycles = 0
 
-for linha in fileIn:
-    parser.parse(linha)
+data = fileIn.read()
+parser.parse(data)
 
 fileIn.close()
 fileOut.close()

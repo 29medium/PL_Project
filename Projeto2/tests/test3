@@ -1,0 +1,14 @@
+declarations
+    int N=10;
+    int prod=1;
+    int aux;
+end
+instructions
+    repeat
+        input aux;
+        prod = prod * aux;
+        N = N-1;
+    until(N==0) end
+
+    print prod;
+end
