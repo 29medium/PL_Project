@@ -124,7 +124,7 @@ def t_NUM(t):
     t.type = reserved.get(t.value, 'NUM')
     return t
 
-t_ignore = " \t\n"
+t_ignore = " \r\t\n"
 
 def t_error(t):
     print("Illegal character: ", t.value[0])

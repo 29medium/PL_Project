@@ -2,6 +2,7 @@
 
 import ply.yacc as yacc
 from comp_lex import tokens
+import os
 
 # -----------------------------------------------------------------
 #                           Program
@@ -9,7 +10,7 @@ from comp_lex import tokens
 
 def p_Program(p):
     "Program : Main"
-    p.parser.fileOut.write(p[1])
+    p[0] = p[1]
 
 def p_Main(p):
     "Main : DEF MAIN MainDeclarations MainInstructions END"
@@ -30,7 +31,7 @@ def p_Main_instructions(p):
 #                         DECLARATIONS
 # -----------------------------------------------------------------
 
-def p_Declarations(p):    
+def p_Declarations(p):
     "Declarations : Declarations Declaration"
 
     p[0] = p[1] + p[2]
@@ -105,7 +106,7 @@ def p_Read_array(p):
 
     (_, _, offset) = res
     p[0] = f'''pushs ">> "\nwrites\npushgp\npushi {offset}\npadd\n{p[4]}read\natoi\nstoren\n'''
-    
+
 def p_Read_matrix(p):
     "Instruction : INPUT ID LBRA Exp RBRA LBRA Exp RBRA SC"
 
@@ -140,7 +141,7 @@ def p_Attribure_array(p):
     "Instruction : ID LBRA Exp RBRA ATTR Exp SC"
 
     res = get_index(p[1], p)
-    
+
     (_, _, offset) = res
 
     p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}{p[6]}storen\n"
@@ -153,7 +154,6 @@ def p_Attribure_matrix(p):
     (col, _, offset) = res
 
     p[0] = f"pushgp\npushi {offset}\npadd\n{p[3]}pushi {col}\nmul\n{p[6]}add\n{p[9]}storen\n"
-
 # -----------------------------------------------------------------
 #                              IF
 # -----------------------------------------------------------------
@@ -268,17 +268,11 @@ def p_Term_mult(p):
 
 def p_Term_div(p):
     "Term : Term DIV Factor"
-    if p[3] != 0:
-        p[0] = f"{p[1]}{p[3]}div\n"
-    else:
-        p[0] = "pushi 0"
+    p[0] = f"{p[1]}{p[3]}div\n"
 
 def p_Term_mod(p):
     "Term : Term MOD Factor"
-    if p[3] != 0:
-        p[0] = f"{p[1]}{p[3]}mod\n"
-    else:
-        p[0] = "pushi 0"
+    p[0] = f"{p[1]}{p[3]}mod\n"
 
 def p_Term_factor(p):
     "Term : Factor"
@@ -338,7 +332,7 @@ def get_index(id, p):
 r = 1
 while r:
     inFilePath = input("Code File Path >> ")
-    
+
     try:
         fileIn = open(inFilePath, "r")
         r = 0
@@ -364,10 +358,14 @@ parser.var = dict() # x => (col, line, offset)
 parser.offset = 0
 parser.ifs = 0
 parser.cycles = 0
-parser.fileOut = fileOut
 
 data = fileIn.read()
-parser.parse(data)
+
+try:
+    result = parser.parse(data)
+    fileOut.write(result)
+except (TypeError):
+    os.remove(outFilePath)
 
 fileIn.close()
 fileOut.close()
