@@ -1,15 +1,18 @@
 def main
     declarations
-        int N=10;
+        int n=10;
         int i;
         int arr[10];
     end
     instructions
+        print "Introduza uma Sequencia de 10 numeros";
         repeat
+            print "Introduza um numero";
             input arr[i];
             i = i + 1;
-        until(i==N) end
+        until(i==n) end
 
+        print "Sequencia invertida";
         repeat
             i = i - 1;
             print arr[i];

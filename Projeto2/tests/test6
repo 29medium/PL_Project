@@ -8,12 +8,15 @@ def main
     instructions
         call potencia;
 
+        print "Potencia: ";
         print res;
     end
 end
 
 def potencia
+    print "Introduza uma base:";
     input b;
+    print "Introduza um expoente:";
     input e;
 
     res = b;

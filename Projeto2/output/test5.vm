@@ -2,7 +2,17 @@ pushi 10
 pushi 0
 pushn 10
 start
+pushs "Introduza uma Sequencia de 10 numeros"
+writes
+pushs "\n"
+writes
 cycle0:
+pushs "Introduza um numero"
+writes
+pushs "\n"
+writes
+pushs ">> "
+writes
 pushgp
 pushi 2
 padd
@@ -18,18 +28,23 @@ pushg 1
 pushg 0
 equal
 jz cycle0
+pushs "Sequencia invertida"
+writes
+pushs "\n"
+writes
 cycle1:
 pushg 1
 pushi 1
 sub
 storeg 1
 pushgp
-pushgp
 pushi 2
 padd
 pushg 1
 loadn
 writei
+pushs "\n"
+writes
 pushg 1
 pushi 0
 equal

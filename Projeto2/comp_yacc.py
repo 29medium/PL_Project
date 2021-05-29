@@ -154,15 +154,19 @@ def p_Read_matrix(p):
 #                         PRINT
 # -----------------------------------------------------------------
 
-def p_Prints_String(p):
-    "Instructions : PRINTS STRING SC"
+def p_Print(p):
+    "Instruction : PRINT Line SC"
+    p[0] = p[2]
 
-    p[0] = f'''pushs {p[2]}\nwrites\n'''
+def p_Line_String(p):
+    "Line : STRING"
 
-def p_Print_Log(p):
-    "Instruction : PRINT Log SC"
+    p[0] = f'''pushs {p[1]}\nwrites\npushs "\\n"\nwrites\n'''
 
-    p[0] = f"{p[2]}writei\n"
+def p_Line_Log(p):
+    "Line : Log"
+
+    p[0] = f'''{p[1]}writei\npushs "\\n"\nwrites\n'''
 
 # -----------------------------------------------------------------
 #                         ATTRIBUTE

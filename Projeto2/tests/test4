@@ -1,20 +1,25 @@
 def main
     declarations
-        int N;
+        int n;
         int aux;
         int counter;
     end
     instructions
-        input N;
-        if(N>0) then
+        print "Introduza um inteiro N:";
+        input n;
+        if(n>0) then
+            print "Introduza numeros pares e impares";
             repeat
                 input aux;
                 if(aux % 2) then
+                    print "Numero impar:";
                     print aux;
                     counter = counter + 1;
                 end
-                N = N-1;
-            until(N==0) end
+                n = n-1;
+            until(n==0) end
+
+            print "Contador de numeros impares:";
             print counter;
         end
     end 

@@ -3,7 +3,6 @@ import ply.lex as lex
 reserved = {
     'int' : 'INT',
     'print' : 'PRINT',
-    'prints': 'PRINTS',
     'input' : 'INPUT',
     'then' : 'THEN',
     'end': 'END',

@@ -14,11 +14,24 @@ storeg 0
 pushg 0
 pushi 0
 sup
-jz endif1
-pushs "Introduza numeros pares e impares"
+jz endif2
+pushs "Introduza N numeros:"
 writes
 pushs "\n"
 writes
+pushs ">> "
+writes
+read
+atoi
+storeg 2
+pushg 0
+pushi 1
+sub
+storeg 0
+pushg 0
+pushi 0
+sup
+jz endif1
 cycle0:
 pushs ">> "
 writes
@@ -26,20 +39,10 @@ read
 atoi
 storeg 1
 pushg 1
-pushi 2
-mod
-jz endif0
-pushs "Numero impar:"
-writes
-pushs "\n"
-writes
-pushg 1
-writei
-pushs "\n"
-writes
 pushg 2
-pushi 1
-add
+inf
+jz endif0
+pushg 1
 storeg 2
 
 endif0:
@@ -51,7 +54,9 @@ pushg 0
 pushi 0
 equal
 jz cycle0
-pushs "Contador de numeros impares:"
+
+endif1:
+pushs "Numero menor:"
 writes
 pushs "\n"
 writes
@@ -60,5 +65,5 @@ writei
 pushs "\n"
 writes
 
-endif1:
+endif2:
 stop

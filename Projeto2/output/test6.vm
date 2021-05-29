@@ -1,0 +1,51 @@
+pushi 0
+pushi 0
+pushi 0
+pushi 1
+start
+pusha potencia
+call
+pushs "Potencia: "
+writes
+pushs "\n"
+writes
+pushg 0
+writei
+pushs "\n"
+writes
+stop
+potencia:
+pushs "Introduza uma base:"
+writes
+pushs "\n"
+writes
+pushs ">> "
+writes
+read
+atoi
+storeg 1
+pushs "Introduza um expoente:"
+writes
+pushs "\n"
+writes
+pushs ">> "
+writes
+read
+atoi
+storeg 2
+pushg 1
+storeg 0
+cycle0:
+pushg 0
+pushg 1
+mul
+storeg 0
+pushg 3
+pushi 1
+add
+storeg 3
+pushg 3
+pushg 2
+equal
+jz cycle0
+return

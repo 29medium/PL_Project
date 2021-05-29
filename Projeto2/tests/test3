@@ -1,6 +1,6 @@
 def main
     declarations
-        int N=10;
+        int n=10;
         int prod=1;
         int aux;
     end
@@ -8,9 +8,10 @@ def main
         repeat
             input aux;
             prod = prod * aux;
-            N = N-1;
-        until(N==0) end
+            n = n-1;
+        until(n==0) end
 
+        print "Produtorio:";
         print prod;
     end
 end
