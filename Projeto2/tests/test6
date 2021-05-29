@@ -1,0 +1,24 @@
+def main 
+    declarations 
+        int res;
+        int b;
+        int e;
+        int i=1;
+    end
+    instructions
+        call potencia;
+
+        print res;
+    end
+end
+
+def potencia
+    input b;
+    input e;
+
+    res = b;
+    repeat
+        res = res * b;
+        i = i+1;
+    until(i==e) end
+end

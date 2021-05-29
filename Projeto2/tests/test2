@@ -5,9 +5,11 @@ def main
         int min;
     end
     instructions
+        prints "Introduza um inteiro N: \n";
         input N;
 
         if(N>0) then
+            prints "Introduza N numeros: \n";
             input min;
             N = N - 1;
 
@@ -22,6 +24,7 @@ def main
             end
 
             print min;
+            prints "tests";
         end
     end
 end

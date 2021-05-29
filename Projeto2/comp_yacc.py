@@ -9,8 +9,12 @@ import os
 # -----------------------------------------------------------------
 
 def p_Program(p):
-    "Program : Main"
-    p[0] = p[1]
+    "Program : Main Functions"
+    p[0] = p[1] + p[2]
+
+# -----------------------------------------------------------------
+#                           MAIN
+# -----------------------------------------------------------------
 
 def p_Main(p):
     "Main : DEF MAIN MainDeclarations MainInstructions END"
@@ -26,6 +30,25 @@ def p_Main_instructions(p):
     "MainInstructions : INSTRUCTIONS Instructions END"
 
     p[0] = p[2]
+
+# -----------------------------------------------------------------
+#                         Functions
+# -----------------------------------------------------------------
+
+def p_Functions(p):
+    "Functions : Functions Function"
+    p[0] = p[1] + p[2]
+
+def p_Functions_empty(p):
+    "Functions : "
+    p[0] = ""
+
+def p_Function(p):
+    "Function : DEF ID Instructions END"
+
+    add_func(p[2], p)
+
+    p[0] = f"{p[2]}:\n{p[3]}return\n"
 
 # -----------------------------------------------------------------
 #                         DECLARATIONS
@@ -88,6 +111,17 @@ def p_Instructions_empty(p):
     p[0] = ""
 
 # -----------------------------------------------------------------
+#                        CALL FUNCTION
+# -----------------------------------------------------------------
+
+def p_Call(p):
+    "Instruction : CALL ID SC"
+
+    add_func_called(p[2], p)
+
+    p[0] = f"pusha {p[2]}\ncall\n"
+
+# -----------------------------------------------------------------
 #                           INPUT
 # -----------------------------------------------------------------
 
@@ -119,6 +153,11 @@ def p_Read_matrix(p):
 # -----------------------------------------------------------------
 #                         PRINT
 # -----------------------------------------------------------------
+
+def p_Prints_String(p):
+    "Instructions : PRINTS STRING SC"
+
+    p[0] = f'''pushs {p[2]}\nwrites\n'''
 
 def p_Print_Log(p):
     "Instruction : PRINT Log SC"
@@ -159,18 +198,14 @@ def p_Attribure_matrix(p):
 # -----------------------------------------------------------------
 
 def p_Condition(p):
-    "Instruction : IF LPAR Log RPAR THEN Instructions Else"
-    p[0] = f"{p[3]}jz else{p.parser.ifs}\n{p[6]}jump endif{p.parser.ifs}\n{p[6]}\nendif{p.parser.ifs}:\n"
+    "Instruction : IF LPAR Log RPAR THEN Instructions ELSE Instructions END"
+    p[0] = f"{p[3]}jz else{p.parser.ifs}\n{p[6]}jump endif{p.parser.ifs}\nelse{p.parser.ifs}:\n{p[8]}\nendif{p.parser.ifs}:\n"
     p.parser.ifs += 1
 
 def p_Condition_simple(p):
     "Instruction : IF LPAR Log RPAR THEN Instructions END"
     p[0] = f"{p[3]}jz endif{p.parser.ifs}\n{p[6]}\nendif{p.parser.ifs}:\n"
     p.parser.ifs += 1
-
-def p_Condition_Else(p):
-    "Else : ELSE Instructions END"
-    p[0] = f"\nelse{p.parser.ifs}:\n{p[2]}"
 
 # -----------------------------------------------------------------
 #                           CYCLE
@@ -314,16 +349,35 @@ def p_Factor_matrix(p):
 # -----------------------------------------------------------------
 
 def p_error(p):
-    print("Syntax Error in input: ", p)
+    print("\nCompilation error, aborting!")
 
 def add_var(id, col, line, p):
     if id not in p.parser.var.keys():
         p.parser.var[id] = (col, line, p.parser.offset)
         p.parser.offset += col * line
+    else:
+        raise Exception
 
 def get_index(id, p):
     if id in p.parser.var.keys():
         return p.parser.var[id]
+    
+def add_func(name, p):
+    if name not in p.parser.funcs:
+        p.parser.funcs.add(name)
+    else:
+        raise Exception
+
+def add_func_called(name, p):
+    if name not in p.parser.called_funcs:
+        p.parser.called_funcs.add(name)
+    else:
+        raise Exception
+
+def check_called_funcs(parser):
+    for called in parser.called_funcs:
+        if called not in parser.funcs:
+            raise Exception
 
 # -----------------------------------------------------------------
 #                         RUN
@@ -355,6 +409,8 @@ while r:
 parser = yacc.yacc()
 
 parser.var = dict() # x => (col, line, offset)
+parser.funcs = set()
+parser.called_funcs = set()
 parser.offset = 0
 parser.ifs = 0
 parser.cycles = 0
@@ -364,7 +420,9 @@ data = fileIn.read()
 try:
     result = parser.parse(data)
     fileOut.write(result)
-except (TypeError):
+    check_called_funcs(parser)
+except (TypeError, Exception):
+    print("\nCompilation error, aborting!")
     os.remove(outFilePath)
 
 fileIn.close()

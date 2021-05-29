@@ -3,6 +3,7 @@ import ply.lex as lex
 reserved = {
     'int' : 'INT',
     'print' : 'PRINT',
+    'prints': 'PRINTS',
     'input' : 'INPUT',
     'then' : 'THEN',
     'end': 'END',
@@ -13,6 +14,7 @@ reserved = {
     'repeat' : 'REPEAT',
     'until' : 'UNTIL',
     'while' : 'WHILE',
+    'call' : 'CALL',
     'for' : 'FOR',
     'do' : 'DO',
     'and' : 'AND',
@@ -22,7 +24,7 @@ reserved = {
     'main' : 'MAIN'
 }
 
-tokens = ['ID', 'PLUS', 'MINUS', 'MUL', 'DIV', 'MOD', 'EQ', 'NE', 'G', 'GE', 'L', 'LE', 'LPAR', 'RPAR', 'LBRA', 'RBRA', 'SC', 'C', 'ATTR', 'NUM'] + list(reserved.values())
+tokens = ['ID', 'PLUS', 'MINUS', 'MUL', 'DIV', 'MOD', 'EQ', 'NE', 'G', 'GE', 'L', 'LE', 'LPAR', 'RPAR', 'LBRA', 'RBRA', 'SC', 'ATTR', 'NUM', 'STRING'] + list(reserved.values())
 
 def t_LPAR(t):
     r'\('
@@ -55,7 +57,7 @@ def t_C(t):
     return t
 
 def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z0-9_]*'
+    r'[a-z_][a-zA-Z0-9_]*'
     t.type = reserved.get(t.value,'ID')
     return t
 
@@ -122,6 +124,11 @@ def t_ATTR(t):
 def t_NUM(t):
     r'\-?\d+'
     t.type = reserved.get(t.value, 'NUM')
+    return t
+
+def t_STRING(t):
+    r'\"[^"]+\"'
+    t.type = reserved.get(t.value, 'STRING')
     return t
 
 t_ignore = " \r\t\n"

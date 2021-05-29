@@ -2,6 +2,8 @@ pushi 0
 pushi 4
 pushn 4
 start
+pushs "Introduza 4 lados\n"
+writes
 cycle0:
 pushs ">> "
 writes
@@ -55,5 +57,13 @@ pushi 3
 loadn
 equal
 mul
-writei
+jz else0
+pushs "Os 4 lados formam um quadrado\n"
+writes
+jump endif0
+else0:
+pushs "Os 4 lados nao formam um quadrado\n"
+writes
+
+endif0:
 stop

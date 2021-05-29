@@ -5,11 +5,17 @@ def main
         int lados[4];
     end
     instructions
+        prints "Introduza 4 lados\n";
+
         repeat
             input lados[i];
             i = i + 1;
         until (i==tamanho) end
 
-        print lados[0]==lados[1] and lados[0]==lados[2] and lados[0]==lados[3];
+        if(lados[0]==lados[1] and lados[0]==lados[2] and lados[0]==lados[3]) then
+            prints "Os 4 lados formam um quadrado\n";
+        else
+            prints "Os 4 lados nao formam um quadrado\n";
+        end
     end
 end
