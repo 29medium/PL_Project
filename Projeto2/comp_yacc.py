@@ -375,8 +375,6 @@ def add_func(name, p):
 def add_func_called(name, p):
     if name not in p.parser.called_funcs:
         p.parser.called_funcs.add(name)
-    else:
-        raise Exception
 
 def check_called_funcs(parser):
     for called in parser.called_funcs:
